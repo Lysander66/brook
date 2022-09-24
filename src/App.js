@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.css'
+import { DEFINE_PATH } from './config/path'
+import LayoutPage from './page/LayoutPage'
+import HomePage from './page/HomePage'
+import PlayerPage from './page/PlayerPage'
+import WebSocketPage from './page/WebSocketPage'
 
-function App() {
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+function App () {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <BrowserRouter>
+      <div className="App">
+        <Routes>
+          <Route path='/' element={<LayoutPage />}>
+            <Route index element={<HomePage />} />
+            <Route path={DEFINE_PATH.player} element={<PlayerPage />} />
+            <Route path={DEFINE_PATH.websocket} element={<WebSocketPage />} />
+          </Route>
+        </Routes>
+      </div>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App

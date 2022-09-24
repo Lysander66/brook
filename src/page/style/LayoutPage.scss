@@ -1,0 +1,25 @@
+.site-logo {
+  height: 5vh;
+  background: #40a9ff;
+}
+
+.site-layout .site-layout-background {
+  padding: 0;
+  height: 5vh;
+  background: #40a9ff;
+}
+
+.myBackTop {
+  right: 50px;
+
+  .ant-back-top-content {
+    background: #1890ff;
+    opacity: 0.3;
+    transition: all 0.3s;
+    box-shadow: 0 0 15px 1px rgba(20, 1, 64, 0.1);
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
