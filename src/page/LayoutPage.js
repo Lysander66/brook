@@ -22,10 +22,19 @@ const LayoutPage = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible theme='light'>
-        <div className='site-logo' />
+      <Sider collapsible >
+        <div className='site-logo'>
+          <div className='g-fire'>
+            {
+              [...Array(200).keys()].map(i => {
+                return <div key={i} className='g-ball' />
+              })
+            }
+          </div>
+        </div>
         <Menu
           mode='inline'
+          theme='dark'
           defaultSelectedKeys={pathname}
           selectedKeys={pathname}
           items={[

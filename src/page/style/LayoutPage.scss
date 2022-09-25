@@ -1,11 +1,68 @@
+$count: 200;
+
+.g-fire {
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  border-radius: 45%;
+  box-sizing: border-box;
+  border: 120px solid #001529;
+  border-bottom: 120px solid transparent;
+  transform: translate(-50%, 0) scaleX(0.45);
+  background-color: #761b00;
+}
+
+.g-ball {
+  position: absolute;
+  top: 60px;
+  transform: translate(0, 0);
+  background: #fa8763;
+  border-radius: 50%;
+  z-index: -1;
+  mix-blend-mode: screen;
+}
+
+@for $i from 1 to $count {
+  .g-ball:nth-child(#{$i}) {
+    $width: #{random(50)}px;
+
+    width: $width;
+    height: $width;
+    left: calc(#{(random(70))}px - 55px);
+  }
+
+  .g-ball:nth-child(#{$i}) {
+    animation: movetop 1s linear -#{random(3000) / 1000}s infinite;
+  }
+}
+
+@keyframes movetop {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(0, 0);
+  }
+  87.7% {
+    transform: translate(0, -170px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0, -170px);
+    opacity: 0;
+  }
+}
+
 .site-logo {
-  height: 5vh;
-  background-image: linear-gradient(to top, #fff1eb 0%, #ace0f9 100%);
+  height: 8vh;
+  background: #001529;
+  overflow: hidden;
+  filter: blur(1px) contrast(5);
 }
 
 .site-layout .site-layout-background {
   padding: 0;
-  height: 5vh;
+  height: 8vh;
   background-image: linear-gradient(
     to right,
     #eea2a2 0%,
