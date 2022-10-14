@@ -8,9 +8,11 @@ import {
   Menu,
 } from 'antd'
 import {
+  CameraOutlined,
   HomeOutlined,
   PlayCircleOutlined,
   WifiOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 
 const { Header, Content, Footer, Sider } = Layout
@@ -55,6 +57,18 @@ const LayoutPage = () => {
               label: 'WebSocket',
               key: 'websocket',
               onClick: () => { navigate(DEFINE_PATH.websocket) },
+            },
+            {
+              icon: <CameraOutlined />,
+              label: 'Live',
+              key: 'live',
+              onClick: () => { navigate(DEFINE_PATH.live) },
+            },
+            {
+              icon: <ThunderboltOutlined />,
+              label: 'Log',
+              key: 'log',
+              onClick: () => { navigate(DEFINE_PATH.log) },
             }
           ]}
         />

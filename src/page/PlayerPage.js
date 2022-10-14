@@ -25,6 +25,9 @@ const PlayerPage = () => {
     <div className='playerDiv'>
       <Form
         name='basic'
+        initialValues={{
+          streamUrl: 'http://39.134.66.66/PLTV/88888888/224/3221225818/index.m3u8'
+        }}
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
         onFinish={onFinish}
