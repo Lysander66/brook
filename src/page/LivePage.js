@@ -44,7 +44,7 @@ const LivePage = () => {
       return response.json()
     }
 
-    let host = params.app === 'esport' ? 'http://18.166.228.71:8085' : 'http://52.81.27.195:8085'
+    let host = params.app === 'esport' ? 'http://18.162.167.111:8281' : 'http://18.166.66.37:8281'
     let url = `${host}/api/stat/all_group?schema=${params.schema}`
     loadList(url).then(data => {
       let list = []
@@ -173,10 +173,6 @@ const LivePage = () => {
       title: 'createdAt',
       dataIndex: 'createdAt',
     },
-    // {
-    //   title: 'originUrl',
-    //   dataIndex: 'originUrl',
-    // },
   ]
 
   return (
