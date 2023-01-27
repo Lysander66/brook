@@ -72,7 +72,7 @@ class _BackgroundFilter extends StatelessWidget {
 }
 
 class _MusicPlayer extends StatelessWidget {
-  final ctrl = Get.put(PlayerController());
+  final ctrl = Get.find<PlayerController>();
 
   final SongVo song;
 
@@ -133,13 +133,7 @@ class _MusicPlayer extends StatelessWidget {
               // onChangedEnd:
             );
           }),
-          _Panel(
-            onPlay: () => ctrl.onPlay(song.id),
-            onNext: ctrl.onNext,
-            onPrevious: ctrl.onPrevious,
-            onPlaybackModeChanged: ctrl.onPlaybackModeChanged,
-            onQueue: ctrl.onQueue,
-          )
+          _Panel(),
         ],
       ),
     );
@@ -149,20 +143,7 @@ class _MusicPlayer extends StatelessWidget {
 class _Panel extends StatelessWidget {
   final PlayerController ctrl = Get.find();
 
-  final VoidCallback onPlay;
-  final VoidCallback onNext;
-  final VoidCallback onPrevious;
-  final VoidCallback onPlaybackModeChanged;
-  final VoidCallback onQueue;
-
-  _Panel({
-    Key? key,
-    required this.onPlay,
-    required this.onNext,
-    required this.onPrevious,
-    required this.onPlaybackModeChanged,
-    required this.onQueue,
-  }) : super(key: key);
+  _Panel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -185,28 +166,28 @@ class _Panel extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                onPrevious();
+                ctrl.onPrevious();
               },
               iconSize: 45,
               icon: const Icon(Icons.skip_previous, color: Colors.white),
             ),
             IconButton(
               onPressed: () {
-                onPlay();
+                ctrl.onResumeOrPause;
               },
               iconSize: 75,
               icon: const Icon(Icons.pause_circle, color: Colors.white),
             ),
             IconButton(
               onPressed: () {
-                onNext();
+                ctrl.onNext();
               },
               iconSize: 45,
               icon: const Icon(Icons.skip_next, color: Colors.white),
             ),
             IconButton(
               onPressed: () {
-                onQueue();
+                ctrl.onQueue();
               },
               iconSize: 30,
               icon: const Icon(Icons.queue_music, color: Colors.white),

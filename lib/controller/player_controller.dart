@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 
 import '../common/constant/player.dart';
 import '../generated/locales.g.dart';
+import '../service/dao/music_dao.dart';
 
 class PlayerController extends GetxController {
-  final _player = audioPlayer;
+  final AudioPlayer _player = audioPlayer;
 
   final _playbackModes = [
     PlaybackMode.repeatAll,
@@ -26,11 +27,15 @@ class PlayerController extends GetxController {
     });
   }
 
-  void onPlay(int id) {
-    var url = 'https://music.163.com/song/media/outer/url?id=$id.mp3';
+  Future<void> onPlay(int id) async {
+    final url = await MusicDao.songUrl(id);
     vlog.i('播放: $url');
     var source = UrlSource(url);
     _player.play(source);
+  }
+
+  void onResumeOrPause() {
+    vlog.i('pause or resume');
   }
 
   void onNext() {

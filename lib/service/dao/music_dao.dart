@@ -11,11 +11,13 @@ class MusicDao {
 
   static late summer.Client client;
 
+  static const _realIP = '113.108.182.52';
   static const _hostProd = 'https://brook.vercel.app';
   static const _hostDev = 'https://brook.vercel.app';
+  static const _search = '/cloudsearch';
   static const _personalized = '/personalized';
   static const _playlistDetail = '/playlist/detail';
-  static const _search = '/cloudsearch';
+  static const _songUrl = '/song/url/v1';
 
   static init(String env) {
     client = summer.Client(
@@ -23,8 +25,23 @@ class MusicDao {
     );
   }
 
+  static Future<SearchResp> search(String keywords) async {
+    final response = await client
+        .R()
+        .setQueryParam('realIP', _realIP)
+        .setQueryParam('keywords', keywords)
+        .get(_search);
+
+    if (response.data['code'] != 200) {
+      vlog.e('code ${response.data['code']}');
+      return SearchResp();
+    }
+    return SearchResp.fromJson(response.data);
+  }
+
   static Future<PersonalizedResp> personalized() async {
-    final response = await client.R().get(_personalized);
+    final response =
+        await client.R().setQueryParam('realIP', _realIP).get(_personalized);
 
     if (response.data['code'] != 200) {
       vlog.e('code ${response.data['code']}');
@@ -36,6 +53,7 @@ class MusicDao {
   static Future<PlaylistResp> playlistDetail(int id) async {
     final response = await client
         .R()
+        .setQueryParam('realIP', _realIP)
         .setQueryParam('id', id.toString())
         .get(_playlistDetail);
 
@@ -46,14 +64,27 @@ class MusicDao {
     return PlaylistResp.fromJson(response.data);
   }
 
-  static Future<SearchResp> search(String keywords) async {
-    final response =
-        await client.R().setQueryParam('keywords', keywords).get(_search);
+  static Future<String> songUrl(int id) async {
+    final response = await client
+        .R()
+        .setQueryParam('realIP', _realIP)
+        .setQueryParam('id', id.toString())
+        .setQueryParam('level', 'exhigh')
+        .get(_songUrl);
 
     if (response.data['code'] != 200) {
       vlog.e('code ${response.data['code']}');
-      return SearchResp();
+      return fixedUrl(id);
     }
-    return SearchResp.fromJson(response.data);
+    for (var val in (response.data['data'] as List<dynamic>)) {
+      var url = (val as Map<String, dynamic>)['url'] as String?;
+      if (url != null && url.isNotEmpty) {
+        return url.replaceFirst('http://', 'https://');
+      }
+    }
+    return fixedUrl(id);
   }
+
+  static String fixedUrl(int id) =>
+      'https://music.163.com/song/media/outer/url?id=$id.mp3';
 }

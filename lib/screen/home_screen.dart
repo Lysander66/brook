@@ -4,11 +4,13 @@ import 'package:get/get.dart';
 
 import '../common/res/r.dart';
 import '../controller/home_controller.dart';
+import '../controller/player_controller.dart';
 import '../generated/locales.g.dart';
 import 'screens.dart';
 
 class HomeScreen extends StatelessWidget {
-  final ctrl = Get.put(HomeController());
+  final homeController = Get.put(HomeController());
+  final playerController = Get.put(PlayerController());
 
   HomeScreen({Key? key}) : super(key: key);
 
@@ -46,13 +48,14 @@ class HomeScreen extends StatelessWidget {
                           shrinkWrap: true,
                           padding: const EdgeInsets.only(top: 20),
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: ctrl.playlists.length,
+                          itemCount: homeController.playlists.length,
                           itemBuilder: (BuildContext context, int index) {
                             return PlaylistCard(
-                              playlist: ctrl.playlists[index],
+                              playlist: homeController.playlists[index],
                               onTap: () async {
-                                final playlistDetail = await ctrl
-                                    .playlistDetail(ctrl.playlists[index].id);
+                                final playlistDetail =
+                                    await homeController.playlistDetail(
+                                        homeController.playlists[index].id);
                                 Get.to(() => PlaylistScreen(
                                     playlist: playlistDetail.playlist));
                               },
@@ -145,7 +148,8 @@ class _DiscoverMusic extends StatelessWidget {
 }
 
 class _TrendingMusic extends StatelessWidget {
-  final ctrl = Get.find<HomeController>();
+  final homeController = Get.find<HomeController>();
+  final playerController = Get.find<PlayerController>();
 
   _TrendingMusic({
     Key? key,
@@ -173,13 +177,14 @@ class _TrendingMusic extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.27,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: ctrl.songs.length,
+                  itemCount: homeController.songs.length,
                   itemBuilder: (BuildContext context, int index) {
                     return SongCard(
-                      song: ctrl.songs[index],
+                      song: homeController.songs[index],
                       onTap: () {
+                        playerController.onPlay(homeController.songs[index].id);
                         Get.to(() => SongScreen(),
-                            arguments: ctrl.songs[index]);
+                            arguments: homeController.songs[index]);
                       },
                     );
                   },

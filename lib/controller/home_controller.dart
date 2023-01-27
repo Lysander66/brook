@@ -13,8 +13,15 @@ class HomeController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
+
     await personalized();
-    await playlistDetail(playlists[0].id);
+
+    var resp = await playlistDetail(playlists[0].id);
+    List<SongVo> list = [];
+    for (var track in resp.playlist.tracks) {
+      list.add(SongVo.fromTrack(track));
+    }
+    songs.value = list;
   }
 
   personalized() async {
@@ -24,13 +31,8 @@ class HomeController extends GetxController {
   }
 
   Future<PlaylistResp> playlistDetail(int id) async {
+    vlog.i('playlist $id');
     var resp = await MusicDao.playlistDetail(id);
-
-    List<SongVo> list = [];
-    for (var track in resp.playlist.tracks) {
-      list.add(SongVo.fromTrack(track));
-    }
-    songs.value = list;
     return resp;
   }
 }

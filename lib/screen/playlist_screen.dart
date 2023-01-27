@@ -2,6 +2,7 @@ import 'package:brook/widget/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controller/player_controller.dart';
 import '../generated/locales.g.dart';
 import '../model/dto/playlist.dart';
 import '../model/vo/song.dart';
@@ -83,9 +84,11 @@ class _PlaylistInformation extends StatelessWidget {
 }
 
 class _PlaylistSongs extends StatelessWidget {
+  final ctrl = Get.find<PlayerController>();
+
   final Playlist playlist;
 
-  const _PlaylistSongs({Key? key, required this.playlist}) : super(key: key);
+  _PlaylistSongs({Key? key, required this.playlist}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +99,7 @@ class _PlaylistSongs extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return ListTile(
           onTap: () {
+            ctrl.onPlay(playlist.tracks[index].id);
             Get.to(() => SongScreen(),
                 arguments: SongVo.fromTrack(playlist.tracks[index]));
           },
