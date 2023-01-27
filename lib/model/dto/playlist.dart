@@ -185,6 +185,14 @@ class Track {
 
   Map<String, dynamic> toJson() => _$TrackToJson(this);
 
+  String get artistName {
+    var name = '';
+    for (int i = 0; i < ar.length; i++) {
+      name += i == 0 ? ar[i].name : '/${ar[i].name}';
+    }
+    return name;
+  }
+
   @override
   String toString() {
     return jsonEncode(this);

@@ -45,10 +45,10 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
-          // type: BottomNavigationBarType.fixed,
-          // backgroundColor: Colors.deepPurple.shade800,
-          // selectedItemColor: Colors.green,
-          // unselectedItemColor: Colors.white,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.deepPurple.shade800,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.grey,
           showSelectedLabels: false,
           showUnselectedLabels: false,
           items: const <BottomNavigationBarItem>[

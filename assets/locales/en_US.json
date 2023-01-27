@@ -12,5 +12,14 @@
     "repeatAll":"repeat all",
     "repeatOne":"repeat 1 song",
     "shuffle":"shuffle"
+  },
+  "home":{
+    "welcome":"Welcome",
+    "enjoy":"Enjoy your favorite music",
+    "trending":"Trending Music",
+    "playlists":"Playlists",
+    "playlist":"Playlist",
+    "more":"View More",
+    "search":"Search"
   }
 }

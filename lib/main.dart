@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       title: 'Music App',
       home: const HomePage(),
       theme: ThemeData(
-          // TODO
+          //TODO
           textTheme: Theme.of(context).textTheme.apply(
                 bodyColor: Colors.white,
                 displayColor: Colors.white,

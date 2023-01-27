@@ -12,5 +12,14 @@
     "repeatAll":"列表循环",
     "repeatOne":"单曲循环",
     "shuffle":"随机播放"
+  },
+  "home":{
+    "welcome":"欢迎",
+    "enjoy":"享受您最喜爱的音乐",
+    "trending":"流行音乐",
+    "playlists":"推荐歌单",
+    "playlist":"歌单",
+    "more":"查看更多",
+    "search":"搜索"
   }
 }
