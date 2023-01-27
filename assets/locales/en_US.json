@@ -1,0 +1,16 @@
+{
+  "environment":{
+    "development":"development",
+    "production":"production"
+  },
+  "language":{
+    "english":"English",
+    "chinese":"Simplified Chinese"
+  },
+  "playbackMode":{
+    "name":"playback mode",
+    "repeatAll":"repeat all",
+    "repeatOne":"repeat 1 song",
+    "shuffle":"shuffle"
+  }
+}

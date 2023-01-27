@@ -1,0 +1,16 @@
+{
+  "environment":{
+    "development":"开发环境",
+    "production":"正式环境"
+  },
+  "language":{
+    "english":"英语",
+    "chinese":"中文简体"
+  },
+  "playbackMode":{
+    "name":"播放模式",
+    "repeatAll":"列表循环",
+    "repeatOne":"单曲循环",
+    "shuffle":"随机播放"
+  }
+}
