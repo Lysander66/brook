@@ -11,9 +11,9 @@ class MusicDao {
 
   static late summer.Client client;
 
-  static const _realIP = '113.108.182.52';
+  static const _realIP = '111.59.95.32';
   static const _hostProd = 'https://brook.vercel.app';
-  static const _hostDev = 'https://brook.vercel.app';
+  static const _hostDev = 'http://192.168.8.27:3000';
   static const _search = '/cloudsearch';
   static const _personalized = '/personalized';
   static const _playlistDetail = '/playlist/detail';
