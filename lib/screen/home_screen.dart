@@ -182,7 +182,7 @@ class _TrendingMusic extends StatelessWidget {
                     return SongCard(
                       song: homeController.songs[index],
                       onTap: () {
-                        playerController.onPlay(homeController.songs[index].id);
+                        playerController.play(homeController.songs[index].id);
                         Get.to(() => SongScreen(),
                             arguments: homeController.songs[index]);
                       },

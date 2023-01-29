@@ -99,7 +99,7 @@ class _PlaylistSongs extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return ListTile(
           onTap: () {
-            ctrl.onPlay(playlist.tracks[index].id);
+            ctrl.play(playlist.tracks[index].id);
             Get.to(() => SongScreen(),
                 arguments: SongVo.fromTrack(playlist.tracks[index]));
           },

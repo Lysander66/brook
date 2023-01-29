@@ -83,60 +83,66 @@ class _MusicPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20.0,
-        vertical: 20.0,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Obx(() => Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20.0,
+            vertical: 20.0,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  song.name,
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      song.name,
+                      style:
+                          Theme.of(context).textTheme.headlineSmall!.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      ctrl.favorite();
+                    },
+                    iconSize: 30,
+                    icon: const Icon(Icons.favorite, color: Colors.redAccent),
+                  ),
+                ],
               ),
-              IconButton(
-                onPressed: () {
-                  ctrl.onFavorite();
+              const SizedBox(height: 10),
+              Text(
+                song.arName,
+                maxLines: 2,
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 50.0),
+              // StreamBuilder<SeekBarData>(
+              //     stream: _seekBarDataStream,
+              //     builder: (context, snapshot) {
+              //       final positionData = snapshot.data;
+              //       return SeekBar(
+              //         position: positionData?.position ?? Duration.zero,
+              //         duration: positionData?.duration ?? Duration.zero,
+              //       );
+              //     }),
+              SeekBar(
+                position: ctrl.position.value,
+                duration: ctrl.duration.value,
+                onChanged: (Duration position) {
+                  ctrl.seek(position);
                 },
-                iconSize: 30,
-                icon: const Icon(Icons.favorite, color: Colors.redAccent),
               ),
+              _Panel(),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            song.arName,
-            maxLines: 2,
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          const SizedBox(height: 50.0),
-          StreamBuilder<SeekBarData>(
-              // stream: _seekBarDataStream,
-              builder: (context, snapshot) {
-            final positionData = snapshot.data;
-            return SeekBar(
-              position: positionData?.position ?? Duration.zero,
-              duration: const Duration(seconds: 100),
-              // duration: positionData?.duration ?? Duration.zero,
-              // onChangedEnd:
-            );
-          }),
-          _Panel(),
-        ],
-      ),
-    );
+        ));
   }
 }
 
@@ -166,21 +172,28 @@ class _Panel extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                ctrl.onPrevious();
+                ctrl.skipPrevious();
               },
               iconSize: 45,
               icon: const Icon(Icons.skip_previous, color: Colors.white),
             ),
             IconButton(
               onPressed: () {
-                ctrl.onResumeOrPause;
+                if (ctrl.isPlaying) {
+                  ctrl.pause();
+                } else {
+                  ctrl.resume();
+                }
               },
               iconSize: 75,
-              icon: const Icon(Icons.pause_circle, color: Colors.white),
+              icon: Icon(
+                ctrl.isPlaying ? Icons.pause_circle : Icons.play_circle,
+                color: Colors.white,
+              ),
             ),
             IconButton(
               onPressed: () {
-                ctrl.onNext();
+                ctrl.skipNext();
               },
               iconSize: 45,
               icon: const Icon(Icons.skip_next, color: Colors.white),

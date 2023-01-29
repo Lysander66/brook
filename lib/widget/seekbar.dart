@@ -1,20 +1,20 @@
 import 'dart:math';
 
-import 'package:brook/util/utils.dart';
 import 'package:flutter/material.dart';
 
-class SeekBarData {
-  final Duration position;
-  final Duration duration;
-
-  SeekBarData(this.position, this.duration);
-}
+// class SeekBarData {
+//   final Duration position;
+//   final Duration duration;
+//
+//   SeekBarData(this.position, this.duration);
+// }
 
 class SeekBar extends StatefulWidget {
   final Duration position;
   final Duration duration;
   final ValueChanged<Duration>? onChanged;
   final ValueChanged<Duration>? onChangeEnd;
+
   const SeekBar({
     Key? key,
     required this.position,
@@ -29,15 +29,6 @@ class SeekBar extends StatefulWidget {
 
 class _SeekBarState extends State<SeekBar> {
   double? _dragValue;
-
-  String formatDuration(Duration? duration) {
-    if (duration == null) {
-      return '--:--';
-    }
-    String minutes = (duration.inSeconds ~/ 60).toString().padLeft(2, '0');
-    String seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +47,8 @@ class _SeekBarState extends State<SeekBar> {
                 overlayShape: const RoundSliderOverlayShape(
                   overlayRadius: 10,
                 ),
-                activeTrackColor: Colors.white.withOpacity(0.2),
-                inactiveTrackColor: Colors.white,
+                activeTrackColor: Colors.white,
+                inactiveTrackColor: Colors.white.withOpacity(0.2),
                 thumbColor: Colors.white,
                 overlayColor: Colors.white,
               ),
@@ -75,7 +66,6 @@ class _SeekBarState extends State<SeekBar> {
                   if (widget.onChanged != null) {
                     widget.onChanged!(Duration(milliseconds: value.round()));
                   }
-                  vlog.i(value);
                 },
                 onChangeEnd: (value) {
                   if (widget.onChangeEnd != null) {
@@ -84,7 +74,6 @@ class _SeekBarState extends State<SeekBar> {
                   setState(() {
                     _dragValue = null;
                   });
-                  vlog.i(value);
                 },
               ),
             ))
@@ -112,5 +101,14 @@ class _SeekBarState extends State<SeekBar> {
         ),
       ],
     );
+  }
+
+  String formatDuration(Duration? duration) {
+    if (duration == null) {
+      return '--:--';
+    }
+    String min = (duration.inSeconds ~/ 60).toString().padLeft(2, '0');
+    String sec = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return '$min:$sec';
   }
 }

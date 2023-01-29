@@ -10,49 +10,44 @@ import '../service/dao/music_dao.dart';
 class PlayerController extends GetxController {
   final AudioPlayer _player = audioPlayer;
 
+  var position = Duration.zero.obs;
+  var duration = Duration.zero.obs;
+  var playerState = PlayerState.stopped.obs;
+
   final _playbackModes = [
     PlaybackMode.repeatAll,
     PlaybackMode.repeatOne,
     PlaybackMode.shuffle
   ];
-  var index = 0.obs;
+  var playbackModeIndex = 0.obs;
 
-  get playbackMode => _playbackModes[index.value];
+  PlaybackMode get playbackMode => _playbackModes[playbackModeIndex.value];
+
+  bool get isPlaying => playerState.value == PlayerState.playing;
 
   @override
   onInit() {
     super.onInit();
-    _player.onPositionChanged.listen((event) {
-      vlog.d('onPositionChanged $event');
+    _player.onPlayerStateChanged.listen((state) {
+      playerState.value = state;
+      vlog.i('state $state');
+    });
+
+    _player.onDurationChanged.listen((duration) {
+      this.duration.value = duration;
+    });
+
+    _player.onPositionChanged.listen((position) {
+      this.position.value = position;
+      vlog.d('onPositionChanged $position');
     });
   }
 
-  Future<void> onPlay(int id) async {
-    final url = await MusicDao.songUrl(id);
-    vlog.i('播放: $url');
-    var source = UrlSource(url);
-    _player.play(source);
-  }
-
-  void onResumeOrPause() {
-    vlog.i('pause or resume');
-  }
-
-  void onNext() {
-    vlog.i('next');
-  }
-
-  void onPrevious() {
-    vlog.i('onPrevious');
-  }
-
-  void onFavorite() {
-    vlog.i('favorite');
-  }
-
   void onPlaybackModeChanged() {
-    index.value =
-        index.value == _playbackModes.length - 1 ? 0 : index.value + 1;
+    playbackModeIndex.value =
+        playbackModeIndex.value == _playbackModes.length - 1
+            ? 0
+            : playbackModeIndex.value + 1;
 
     String message = playbackMode == PlaybackMode.shuffle
         ? LocaleKeys.playbackMode_shuffle.tr
@@ -70,5 +65,37 @@ class PlayerController extends GetxController {
 
   void onQueue() {
     vlog.i('onQueue');
+  }
+
+  void favorite() {
+    vlog.i('favorite');
+  }
+
+  Future<void> play(int id) async {
+    final url = await MusicDao.songUrl(id);
+    vlog.i('播放: $url');
+    var source = UrlSource(url);
+    // var source = AssetSource(url);
+    _player.play(source);
+  }
+
+  void pause() {
+    _player.pause();
+  }
+
+  void resume() {
+    _player.resume();
+  }
+
+  void seek(Duration position) {
+    _player.seek(position);
+  }
+
+  void skipPrevious() {
+    vlog.i('previous');
+  }
+
+  void skipNext() {
+    vlog.i('next');
   }
 }
