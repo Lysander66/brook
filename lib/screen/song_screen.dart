@@ -72,7 +72,7 @@ class _BackgroundFilter extends StatelessWidget {
 }
 
 class _MusicPlayer extends StatelessWidget {
-  final ctrl = Get.find<PlayerController>();
+  final PlayerController playerController = Get.find();
 
   final SongVo song;
 
@@ -106,7 +106,7 @@ class _MusicPlayer extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      ctrl.favorite();
+                      playerController.favorite();
                     },
                     iconSize: 30,
                     icon: const Icon(Icons.favorite, color: Colors.redAccent),
@@ -133,10 +133,10 @@ class _MusicPlayer extends StatelessWidget {
               //       );
               //     }),
               SeekBar(
-                position: ctrl.position.value,
-                duration: ctrl.duration.value,
+                position: playerController.position.value,
+                duration: playerController.duration.value,
                 onChanged: (Duration position) {
-                  ctrl.seek(position);
+                  playerController.seek(position);
                 },
               ),
               _Panel(),
@@ -147,7 +147,7 @@ class _MusicPlayer extends StatelessWidget {
 }
 
 class _Panel extends StatelessWidget {
-  final PlayerController ctrl = Get.find();
+  final PlayerController playerController = Get.find();
 
   _Panel({Key? key}) : super(key: key);
 
@@ -158,13 +158,13 @@ class _Panel extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () {
-                ctrl.onPlaybackModeChanged();
+                playerController.onPlaybackModeChanged();
               },
               iconSize: 30,
               icon: Icon(
-                ctrl.playbackMode == PlaybackMode.shuffle
+                playerController.playbackMode == PlaybackMode.shuffle
                     ? Icons.shuffle
-                    : ctrl.playbackMode == PlaybackMode.repeatOne
+                    : playerController.playbackMode == PlaybackMode.repeatOne
                         ? Icons.repeat_one
                         : Icons.repeat,
                 color: Colors.white,
@@ -172,35 +172,37 @@ class _Panel extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                ctrl.skipPrevious();
+                playerController.skipPrevious();
               },
               iconSize: 45,
               icon: const Icon(Icons.skip_previous, color: Colors.white),
             ),
             IconButton(
               onPressed: () {
-                if (ctrl.isPlaying) {
-                  ctrl.pause();
+                if (playerController.isPlaying) {
+                  playerController.pause();
                 } else {
-                  ctrl.resume();
+                  playerController.resume();
                 }
               },
               iconSize: 75,
               icon: Icon(
-                ctrl.isPlaying ? Icons.pause_circle : Icons.play_circle,
+                playerController.isPlaying
+                    ? Icons.pause_circle
+                    : Icons.play_circle,
                 color: Colors.white,
               ),
             ),
             IconButton(
               onPressed: () {
-                ctrl.skipNext();
+                playerController.skipNext();
               },
               iconSize: 45,
               icon: const Icon(Icons.skip_next, color: Colors.white),
             ),
             IconButton(
               onPressed: () {
-                ctrl.onQueue();
+                playerController.onQueue();
               },
               iconSize: 30,
               icon: const Icon(Icons.queue_music, color: Colors.white),

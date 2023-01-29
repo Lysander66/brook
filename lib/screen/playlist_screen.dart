@@ -84,7 +84,7 @@ class _PlaylistInformation extends StatelessWidget {
 }
 
 class _PlaylistSongs extends StatelessWidget {
-  final ctrl = Get.find<PlayerController>();
+  final PlayerController playerController = Get.find();
 
   final Playlist playlist;
 
@@ -99,7 +99,11 @@ class _PlaylistSongs extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return ListTile(
           onTap: () {
-            ctrl.play(playlist.tracks[index].id);
+            List<SongVo> songs = [];
+            for (var track in playlist.tracks) {
+              songs.add(SongVo.fromTrack(track));
+            }
+            playerController.startPlaying(songs, index);
             Get.to(() => SongScreen(),
                 arguments: SongVo.fromTrack(playlist.tracks[index]));
           },

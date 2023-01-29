@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:brook/model/vo/song.dart';
 import 'package:brook/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -24,6 +25,9 @@ class PlayerController extends GetxController {
   PlaybackMode get playbackMode => _playbackModes[playbackModeIndex.value];
 
   bool get isPlaying => playerState.value == PlayerState.playing;
+
+  final songs = <SongVo>[].obs;
+  int _curr = 0;
 
   @override
   onInit() {
@@ -71,12 +75,57 @@ class PlayerController extends GetxController {
     vlog.i('favorite');
   }
 
+  Future<void> startPlaying(List<SongVo> tracks, int index) async {
+    if (tracks.isEmpty) {
+      vlog.e('empty tracks');
+      return;
+    }
+    if (index < 0 || index >= tracks.length) {
+      vlog.e('index out of range: index:$index length:${tracks.length}');
+      return;
+    }
+
+    play(tracks[index].id);
+    _curr = index;
+    songs.value = tracks;
+  }
+
+  void skipPrevious() {
+    if (songs.length <= 1) {
+      vlog.i('length:${songs.length}');
+      return;
+    }
+
+    if (playbackMode == PlaybackMode.shuffle) {
+      vlog.i('shuffle previous $_curr');
+    } else {
+      _curr = _curr == 0 ? songs.length - 1 : _curr - 1;
+      play(songs[_curr].id);
+      vlog.i('previous $_curr');
+    }
+  }
+
+  void skipNext() {
+    if (songs.length <= 1) {
+      vlog.i('length:${songs.length}');
+      return;
+    }
+
+    if (playbackMode == PlaybackMode.shuffle) {
+      vlog.i('shuffle next $_curr');
+    } else {
+      _curr = _curr == songs.length - 1 ? 0 : _curr + 1;
+      play(songs[_curr].id);
+      vlog.i('next $_curr');
+    }
+  }
+
   Future<void> play(int id) async {
     final url = await MusicDao.songUrl(id);
-    vlog.i('播放: $url');
     var source = UrlSource(url);
     // var source = AssetSource(url);
     _player.play(source);
+    vlog.i('播放: $url');
   }
 
   void pause() {
@@ -89,13 +138,5 @@ class PlayerController extends GetxController {
 
   void seek(Duration position) {
     _player.seek(position);
-  }
-
-  void skipPrevious() {
-    vlog.i('previous');
-  }
-
-  void skipNext() {
-    vlog.i('next');
   }
 }

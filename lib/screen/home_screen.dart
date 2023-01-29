@@ -148,8 +148,8 @@ class _DiscoverMusic extends StatelessWidget {
 }
 
 class _TrendingMusic extends StatelessWidget {
-  final homeController = Get.find<HomeController>();
-  final playerController = Get.find<PlayerController>();
+  final HomeController homeController = Get.find();
+  final PlayerController playerController = Get.find();
 
   _TrendingMusic({
     Key? key,
@@ -182,7 +182,8 @@ class _TrendingMusic extends StatelessWidget {
                     return SongCard(
                       song: homeController.songs[index],
                       onTap: () {
-                        playerController.play(homeController.songs[index].id);
+                        playerController.startPlaying(
+                            homeController.songs, index);
                         Get.to(() => SongScreen(),
                             arguments: homeController.songs[index]);
                       },

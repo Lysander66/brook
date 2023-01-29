@@ -41,7 +41,7 @@ class SongVo {
   }
 
   static String ellipsis(String name) {
-    return name.length <= 15 ? name : '${name.substring(0, 15)}...';
+    return name.length <= 10 ? name : '${name.substring(0, 10)}...';
   }
 
   @override
