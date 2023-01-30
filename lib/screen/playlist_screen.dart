@@ -104,8 +104,7 @@ class _PlaylistSongs extends StatelessWidget {
               songs.add(SongVo.fromTrack(track));
             }
             playerController.startPlaying(songs, index);
-            Get.to(() => SongScreen(),
-                arguments: SongVo.fromTrack(playlist.tracks[index]));
+            Get.to(() => SongScreen());
           },
           leading: Text(
             '${index + 1}',

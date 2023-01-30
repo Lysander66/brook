@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:brook/util/utils.dart';
+import 'package:http/http.dart' as http;
 import 'package:summer/summer.dart' as summer;
 
 import '../../common/constant/env.dart';
@@ -11,7 +15,6 @@ class MusicDao {
 
   static late summer.Client client;
 
-  static const _realIP = '111.59.95.32';
   static const _hostProd = 'https://brook.vercel.app';
   static const _hostDev = 'http://192.168.8.27:3000';
   static const _search = '/cloudsearch';
@@ -22,15 +25,35 @@ class MusicDao {
   static init(String env) {
     client = summer.Client(
       baseURL: env == Environment.prod ? _hostProd : _hostDev,
+      udBeforeRequest: onBeforeRequest,
+      // afterResponse: onAfterResponse,
     );
   }
 
+  static void onBeforeRequest(summer.Client c, summer.Request r) {
+    r.setQueryParam('realIP', '111.59.95.32');
+  }
+
+  static Map<String, dynamic> onAfterResponse(http.Response response) {
+    // 4xx  5xx
+    if (response.statusCode >= HttpStatus.badRequest) {
+      vlog.e('${response.statusCode} ${response.request?.url}');
+      vlog.e(response.statusCode);
+      // throw HttpException('${response.statusCode}');
+      return {};
+    }
+
+    var resp = jsonDecode(response.body);
+    if (resp['code'] != 0) {
+      vlog.e('${resp['msg']} ${response.request?.url}');
+      return {};
+    }
+    return resp['data'];
+  }
+
   static Future<SearchResp> search(String keywords) async {
-    final response = await client
-        .R()
-        .setQueryParam('realIP', _realIP)
-        .setQueryParam('keywords', keywords)
-        .get(_search);
+    final response =
+        await client.R().setQueryParam('keywords', keywords).get(_search);
 
     if (response.data['code'] != 200) {
       vlog.e('code ${response.data['code']}');
@@ -40,8 +63,7 @@ class MusicDao {
   }
 
   static Future<PersonalizedResp> personalized() async {
-    final response =
-        await client.R().setQueryParam('realIP', _realIP).get(_personalized);
+    final response = await client.R().get(_personalized);
 
     if (response.data['code'] != 200) {
       vlog.e('code ${response.data['code']}');
@@ -53,7 +75,6 @@ class MusicDao {
   static Future<PlaylistResp> playlistDetail(int id) async {
     final response = await client
         .R()
-        .setQueryParam('realIP', _realIP)
         .setQueryParam('id', id.toString())
         .get(_playlistDetail);
 
@@ -67,7 +88,6 @@ class MusicDao {
   static Future<String> songUrl(int id) async {
     final response = await client
         .R()
-        .setQueryParam('realIP', _realIP)
         .setQueryParam('id', id.toString())
         .setQueryParam('level', 'exhigh')
         .get(_songUrl);

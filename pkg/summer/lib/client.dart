@@ -7,6 +7,9 @@ import 'logger.dart';
 import 'request.dart';
 
 final logger = Logger();
+
+typedef RequestMiddleware = void Function(Client, Request);
+
 typedef ResponseMiddleware = Map<String, dynamic> Function(http.Response);
 
 class Client {
@@ -16,23 +19,29 @@ class Client {
   Duration? timeout;
   int? retryCount;
   String? proxyURL;
+  RequestMiddleware? udBeforeRequest;
   ResponseMiddleware? afterResponse;
 
-  Client(
-      {this.baseURL = '',
-      this.headers,
-      this.timeout,
-      this.retryCount,
-      this.proxyURL,
-      this.afterResponse});
+  Client({
+    this.baseURL = '',
+    this.headers,
+    this.timeout,
+    this.retryCount,
+    this.proxyURL,
+    this.udBeforeRequest,
+    this.afterResponse,
+  });
 
-  Client.withClient(this.httpClient,
-      {this.baseURL = '',
-      this.headers,
-      this.timeout,
-      this.retryCount,
-      this.proxyURL,
-      this.afterResponse});
+  Client.withClient(
+    this.httpClient, {
+    this.baseURL = '',
+    this.headers,
+    this.timeout,
+    this.retryCount,
+    this.proxyURL,
+    this.udBeforeRequest,
+    this.afterResponse,
+  });
 
   @override
   String toString() {
@@ -139,12 +148,17 @@ class Client {
   }
 
   static Uri? parseRequestURL(Client c, Request r) {
+    if (c.udBeforeRequest != null) {
+      c.udBeforeRequest!(c, r);
+    }
+
     if (r.pathParams.isNotEmpty) {
       r.pathParams.forEach((p, v) {
         r.url = r.url.replaceAll('{$p}', v); //todo escape
       });
     }
     r.url = c.baseURL + r.url; //todo slash
+
     var u = Uri.tryParse(r.url);
     if (u == null) {
       logger.e('FormatException: $r');
@@ -167,10 +181,12 @@ class Client {
         logger.e('FormatException: $r');
         return null;
     }
+
     // merge
     if (c.headers != null) {
       r.headers = {...c.headers!, ...r.headers};
     }
+
     logger.d(r.headers);
     logger.d(u.toString());
     return u;

@@ -184,8 +184,7 @@ class _TrendingMusic extends StatelessWidget {
                       onTap: () {
                         playerController.startPlaying(
                             homeController.songs, index);
-                        Get.to(() => SongScreen(),
-                            arguments: homeController.songs[index]);
+                        Get.to(() => SongScreen());
                       },
                     );
                   },

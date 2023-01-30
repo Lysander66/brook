@@ -22,19 +22,24 @@ class PlayerController extends GetxController {
   ];
   var playbackModeIndex = 0.obs;
 
+  final songs = <SongVo>[].obs;
+  var curr = 0.obs;
+
+  SongVo get song => songs.isNotEmpty ? songs[curr.value] : SongVo();
+
   PlaybackMode get playbackMode => _playbackModes[playbackModeIndex.value];
 
   bool get isPlaying => playerState.value == PlayerState.playing;
-
-  final songs = <SongVo>[].obs;
-  int _curr = 0;
 
   @override
   onInit() {
     super.onInit();
     _player.onPlayerStateChanged.listen((state) {
       playerState.value = state;
-      vlog.i('state $state');
+      if (state == PlayerState.completed) {
+        skipNext();
+        vlog.i('state $state');
+      }
     });
 
     _player.onDurationChanged.listen((duration) {
@@ -75,7 +80,7 @@ class PlayerController extends GetxController {
     vlog.i('favorite');
   }
 
-  Future<void> startPlaying(List<SongVo> tracks, int index) async {
+  void startPlaying(List<SongVo> tracks, int index) {
     if (tracks.isEmpty) {
       vlog.e('empty tracks');
       return;
@@ -86,8 +91,8 @@ class PlayerController extends GetxController {
     }
 
     play(tracks[index].id);
-    _curr = index;
     songs.value = tracks;
+    curr.value = index;
   }
 
   void skipPrevious() {
@@ -97,11 +102,11 @@ class PlayerController extends GetxController {
     }
 
     if (playbackMode == PlaybackMode.shuffle) {
-      vlog.i('shuffle previous $_curr');
+      vlog.i('shuffle previous $curr');
     } else {
-      _curr = _curr == 0 ? songs.length - 1 : _curr - 1;
-      play(songs[_curr].id);
-      vlog.i('previous $_curr');
+      curr.value = curr.value == 0 ? songs.length - 1 : curr.value - 1;
+      play(songs[curr.value].id);
+      vlog.i('previous $curr');
     }
   }
 
@@ -112,11 +117,11 @@ class PlayerController extends GetxController {
     }
 
     if (playbackMode == PlaybackMode.shuffle) {
-      vlog.i('shuffle next $_curr');
+      vlog.i('shuffle next $curr');
     } else {
-      _curr = _curr == songs.length - 1 ? 0 : _curr + 1;
-      play(songs[_curr].id);
-      vlog.i('next $_curr');
+      curr.value = curr.value == songs.length - 1 ? 0 : curr.value + 1;
+      play(songs[curr.value].id);
+      vlog.i('next $curr');
     }
   }
 

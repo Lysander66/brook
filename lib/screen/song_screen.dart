@@ -7,7 +7,7 @@ import '../controller/player_controller.dart';
 import '../model/vo/song.dart';
 
 class SongScreen extends StatelessWidget {
-  final SongVo song = Get.arguments ?? SongVo();
+  final PlayerController playerController = Get.find();
 
   SongScreen({Key? key}) : super(key: key);
 
@@ -20,14 +20,14 @@ class SongScreen extends StatelessWidget {
       ),
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          cachedNetworkImage(song.alPicUrl),
-          const _BackgroundFilter(),
-          _MusicPlayer(song: song),
-        ],
-      ),
+      body: Obx(() => Stack(
+            fit: StackFit.expand,
+            children: [
+              cachedNetworkImage(playerController.song.alPicUrl),
+              const _BackgroundFilter(),
+              _MusicPlayer(song: playerController.song),
+            ],
+          )),
     );
   }
 }
