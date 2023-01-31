@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../common/constant/player.dart';
 import '../controller/player_controller.dart';
-import '../model/vo/song.dart';
+import 'play_list.dart';
 
 class SongScreen extends StatelessWidget {
   final PlayerController playerController = Get.find();
@@ -20,14 +20,14 @@ class SongScreen extends StatelessWidget {
       ),
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
-      body: Obx(() => Stack(
-            fit: StackFit.expand,
-            children: [
-              cachedNetworkImage(playerController.song.alPicUrl),
-              const _BackgroundFilter(),
-              _MusicPlayer(song: playerController.song),
-            ],
-          )),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Obx(() => cachedNetworkImage(playerController.song.alPicUrl)),
+          const _BackgroundFilter(),
+          _MusicPlayer(),
+        ],
+      ),
     );
   }
 }
@@ -74,12 +74,7 @@ class _BackgroundFilter extends StatelessWidget {
 class _MusicPlayer extends StatelessWidget {
   final PlayerController playerController = Get.find();
 
-  final SongVo song;
-
-  _MusicPlayer({
-    Key? key,
-    required this.song,
-  }) : super(key: key);
+  _MusicPlayer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +91,7 @@ class _MusicPlayer extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      song.name,
+                      playerController.song.name,
                       style:
                           Theme.of(context).textTheme.headlineSmall!.copyWith(
                                 color: Colors.white,
@@ -115,7 +110,7 @@ class _MusicPlayer extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                song.arName,
+                playerController.song.arName,
                 maxLines: 2,
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       color: Colors.white,
@@ -202,6 +197,7 @@ class _Panel extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
+                showPlayList(context);
                 playerController.onQueue();
               },
               iconSize: 30,

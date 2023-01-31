@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../common/constant/player.dart';
 import '../generated/locales.g.dart';
+import '../model/vo/playback_data.dart';
 import '../service/dao/music_dao.dart';
 
 class PlayerController extends GetxController {
@@ -22,10 +23,22 @@ class PlayerController extends GetxController {
   ];
   var playbackModeIndex = 0.obs;
 
-  final songs = <SongVo>[].obs;
-  var curr = 0.obs;
+  // 歌单原始顺序
+  final data = PlaybackData().obs;
+  // 随机播放
+  final shuffleData = PlaybackData().obs;
 
-  SongVo get song => songs.isNotEmpty ? songs[curr.value] : SongVo();
+  List<SongVo> get songs => playbackMode == PlaybackMode.shuffle
+      ? shuffleData.value.songs
+      : data.value.songs;
+
+  SongVo get song => playbackMode == PlaybackMode.shuffle
+      ? shuffleData.value.song
+      : data.value.song;
+
+  int get curr => playbackMode == PlaybackMode.shuffle
+      ? shuffleData.value.curr
+      : data.value.curr;
 
   PlaybackMode get playbackMode => _playbackModes[playbackModeIndex.value];
 
@@ -37,8 +50,8 @@ class PlayerController extends GetxController {
     _player.onPlayerStateChanged.listen((state) {
       playerState.value = state;
       if (state == PlayerState.completed) {
-        skipNext();
-        vlog.i('state $state');
+        onCompleted();
+        vlog.d('state $state');
       }
     });
 
@@ -90,9 +103,33 @@ class PlayerController extends GetxController {
       return;
     }
 
-    play(tracks[index].id);
-    songs.value = tracks;
-    curr.value = index;
+    data.value.reload(tracks);
+    if (playbackMode == PlaybackMode.shuffle) {
+      reshuffle();
+    } else {
+      data.value.setCurr(index);
+      _play(tracks[index].id);
+    }
+  }
+
+  void reshuffle() {
+    var shuffleSongs = List<SongVo>.from(data.value.songs)..shuffle();
+    shuffleData.value.reload(shuffleSongs);
+    shuffleData.value.setCurr(0);
+    _play(shuffleSongs[0].id);
+  }
+
+  void onCompleted() {
+    switch (playbackMode) {
+      case PlaybackMode.repeatAll:
+        skipNext();
+        break;
+      case PlaybackMode.repeatOne:
+        _player.seek(Duration.zero);
+        break;
+      case PlaybackMode.shuffle:
+        reshuffle();
+    }
   }
 
   void skipPrevious() {
@@ -102,11 +139,11 @@ class PlayerController extends GetxController {
     }
 
     if (playbackMode == PlaybackMode.shuffle) {
-      vlog.i('shuffle previous $curr');
+      _play(songs[shuffleData.value.previous()].id);
+      vlog.i('previous shuffle ${shuffleData.value.curr}');
     } else {
-      curr.value = curr.value == 0 ? songs.length - 1 : curr.value - 1;
-      play(songs[curr.value].id);
-      vlog.i('previous $curr');
+      _play(songs[data.value.previous()].id);
+      vlog.i('previous repeat ${data.value.curr}');
     }
   }
 
@@ -117,15 +154,15 @@ class PlayerController extends GetxController {
     }
 
     if (playbackMode == PlaybackMode.shuffle) {
-      vlog.i('shuffle next $curr');
+      _play(songs[shuffleData.value.next()].id);
+      vlog.i('next shuffle ${shuffleData.value.curr}');
     } else {
-      curr.value = curr.value == songs.length - 1 ? 0 : curr.value + 1;
-      play(songs[curr.value].id);
-      vlog.i('next $curr');
+      _play(songs[data.value.next()].id);
+      vlog.i('next repeat ${data.value.curr}');
     }
   }
 
-  Future<void> play(int id) async {
+  Future<void> _play(int id) async {
     final url = await MusicDao.songUrl(id);
     var source = UrlSource(url);
     // var source = AssetSource(url);
