@@ -1,7 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:brook/model/vo/song.dart';
 import 'package:brook/util/utils.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../common/constant/player.dart';
@@ -23,9 +23,7 @@ class PlayerController extends GetxController {
   ];
   var playbackModeIndex = 0.obs;
 
-  // 歌单原始顺序
   final data = PlaybackData().obs;
-  // 随机播放
   final shuffleData = PlaybackData().obs;
 
   List<SongVo> get songs => playbackMode == PlaybackMode.shuffle
@@ -51,7 +49,6 @@ class PlayerController extends GetxController {
       playerState.value = state;
       if (state == PlayerState.completed) {
         onCompleted();
-        vlog.d('state $state');
       }
     });
 
@@ -65,32 +62,17 @@ class PlayerController extends GetxController {
     });
   }
 
-  void onPlaybackModeChanged() {
-    playbackModeIndex.value =
-        playbackModeIndex.value == _playbackModes.length - 1
-            ? 0
-            : playbackModeIndex.value + 1;
-
-    String message = playbackMode == PlaybackMode.shuffle
-        ? LocaleKeys.playbackMode_shuffle.tr
-        : playbackMode == PlaybackMode.repeatOne
-            ? LocaleKeys.playbackMode_repeatOne.tr
-            : LocaleKeys.playbackMode_repeatAll.tr;
-
-    Get.snackbar(
-      LocaleKeys.playbackMode_name.tr,
-      message,
-      margin: const EdgeInsets.all(20.0),
-      duration: const Duration(seconds: 2),
-    );
-  }
-
-  void onQueue() {
-    vlog.i('onQueue');
-  }
-
-  void favorite() {
-    vlog.i('favorite');
+  void onCompleted() {
+    switch (playbackMode) {
+      case PlaybackMode.repeatAll:
+        skipNext();
+        break;
+      case PlaybackMode.repeatOne:
+        _play(song.id);
+        break;
+      case PlaybackMode.shuffle:
+        reshuffle(song.id);
+    }
   }
 
   void startPlaying(List<SongVo> tracks, int index) {
@@ -103,33 +85,26 @@ class PlayerController extends GetxController {
       return;
     }
 
+    //歌单原始顺序
     data.value.reload(tracks);
+
+    int id = tracks[index].id;
+    if (!_playWrap(id)) {
+      return;
+    }
     if (playbackMode == PlaybackMode.shuffle) {
-      reshuffle();
+      //随机播放
+      reshuffle(id);
     } else {
-      data.value.setCurr(index);
-      _play(tracks[index].id);
+      //列表循环 单曲循环
+      data.value.findCurr(id);
+      vlog.i('message ${song.id}');
     }
   }
 
-  void reshuffle() {
-    var shuffleSongs = List<SongVo>.from(data.value.songs)..shuffle();
-    shuffleData.value.reload(shuffleSongs);
-    shuffleData.value.setCurr(0);
-    _play(shuffleSongs[0].id);
-  }
-
-  void onCompleted() {
-    switch (playbackMode) {
-      case PlaybackMode.repeatAll:
-        skipNext();
-        break;
-      case PlaybackMode.repeatOne:
-        _player.seek(Duration.zero);
-        break;
-      case PlaybackMode.shuffle:
-        reshuffle();
-    }
+  void reshuffle(int id) {
+    shuffleData.value.reload(List<SongVo>.from(data.value.songs)..shuffle());
+    shuffleData.value.findCurr(id);
   }
 
   void skipPrevious() {
@@ -162,6 +137,15 @@ class PlayerController extends GetxController {
     }
   }
 
+  bool _playWrap(int id) {
+    if (song.id == id) {
+      vlog.i('The same song: $id ${playerState.value}');
+      return false;
+    }
+    _play(id);
+    return true;
+  }
+
   Future<void> _play(int id) async {
     final url = await MusicDao.songUrl(id);
     var source = UrlSource(url);
@@ -180,5 +164,53 @@ class PlayerController extends GetxController {
 
   void seek(Duration position) {
     _player.seek(position);
+  }
+
+  void onQueue() {
+    vlog.d('onQueue');
+  }
+
+  void favorite() {
+    song.isFavorite = 1 - song.isFavorite;
+  }
+
+  void onPlaybackModeChanged() {
+    playbackModeIndex.value =
+        playbackModeIndex.value == _playbackModes.length - 1
+            ? 0
+            : playbackModeIndex.value + 1;
+
+    if (playbackMode == PlaybackMode.repeatAll) {
+      data.value.findCurr(shuffleData.value.song.id);
+      vlog.i('findCurr shuffle ${shuffleData.value.song.id}');
+    } else if (playbackMode == PlaybackMode.shuffle) {
+      reshuffle(data.value.song.id);
+      vlog.i('findCurr ${song.id}');
+    }
+
+    Get.snackbar(
+      LocaleKeys.playbackMode_name.tr,
+      playbackModeText(),
+      margin: const EdgeInsets.all(20.0),
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  IconData playbackModeIcon() {
+    if (playbackMode == PlaybackMode.shuffle) {
+      return Icons.shuffle;
+    } else if (playbackMode == PlaybackMode.repeatOne) {
+      return Icons.repeat_one;
+    }
+    return Icons.repeat;
+  }
+
+  String playbackModeText() {
+    if (playbackMode == PlaybackMode.shuffle) {
+      return LocaleKeys.playbackMode_shuffle.tr;
+    } else if (playbackMode == PlaybackMode.repeatOne) {
+      return LocaleKeys.playbackMode_repeatOne.tr;
+    }
+    return LocaleKeys.playbackMode_repeatAll.tr;
   }
 }

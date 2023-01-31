@@ -2,9 +2,8 @@ import 'package:brook/widget/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../common/constant/player.dart';
 import '../controller/player_controller.dart';
-import 'play_list.dart';
+import 'play_queue.dart';
 
 class SongScreen extends StatelessWidget {
   final PlayerController playerController = Get.find();
@@ -104,7 +103,10 @@ class _MusicPlayer extends StatelessWidget {
                       playerController.favorite();
                     },
                     iconSize: 30,
-                    icon: const Icon(Icons.favorite, color: Colors.redAccent),
+                    icon: playerController.song.isFavorite == 1
+                        ? const Icon(Icons.favorite, color: Colors.red)
+                        : const Icon(Icons.favorite_outline,
+                            color: Colors.white),
                   ),
                 ],
               ),
@@ -157,11 +159,7 @@ class _Panel extends StatelessWidget {
               },
               iconSize: 30,
               icon: Icon(
-                playerController.playbackMode == PlaybackMode.shuffle
-                    ? Icons.shuffle
-                    : playerController.playbackMode == PlaybackMode.repeatOne
-                        ? Icons.repeat_one
-                        : Icons.repeat,
+                playerController.playbackModeIcon(),
                 color: Colors.white,
               ),
             ),
@@ -197,7 +195,7 @@ class _Panel extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                showPlayList(context);
+                showQueue(context);
                 playerController.onQueue();
               },
               iconSize: 30,

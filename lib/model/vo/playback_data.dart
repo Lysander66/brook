@@ -3,12 +3,16 @@ import 'song.dart';
 class PlaybackData {
   List<SongVo> songs = [];
 
-  int _curr = 0;
+  int _curr = -1;
 
   int get curr => _curr;
 
-  setCurr(int value) {
-    _curr = value;
+  void findCurr(int id) {
+    for (var i = 0; i < songs.length; i++) {
+      if (songs[i].id == id) {
+        _curr = i;
+      }
+    }
   }
 
   void reload(List<SongVo> tracks) {
@@ -25,5 +29,5 @@ class PlaybackData {
     return _curr;
   }
 
-  SongVo get song => songs.isNotEmpty ? songs[_curr] : SongVo();
+  SongVo get song => songs.isNotEmpty && _curr >= 0 ? songs[_curr] : SongVo();
 }

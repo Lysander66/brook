@@ -31,7 +31,7 @@ class HomeController extends GetxController {
   }
 
   Future<PlaylistResp> playlistDetail(int id) async {
-    vlog.i('playlist $id');
+    vlog.d('playlist $id');
     var resp = await MusicDao.playlistDetail(id);
     return resp;
   }

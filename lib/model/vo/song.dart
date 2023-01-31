@@ -14,6 +14,7 @@ class SongVo {
   String arName;
   String nameEllipsis;
   String arNameEllipsis;
+  int isFavorite;
 
   SongVo({
     this.id = 0,
@@ -22,6 +23,7 @@ class SongVo {
     this.arName = '',
     this.nameEllipsis = '',
     this.arNameEllipsis = '',
+    this.isFavorite = 1,
   });
 
   factory SongVo.fromJson(Map<String, dynamic> json) => _$SongVoFromJson(json);
@@ -41,7 +43,7 @@ class SongVo {
   }
 
   static String ellipsis(String name) {
-    return name.length <= 8 ? name : '${name.substring(0, 8)}...';
+    return name.length <= 9 ? name : '${name.substring(0, 9)}...';
   }
 
   @override
