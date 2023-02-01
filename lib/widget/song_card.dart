@@ -45,25 +45,29 @@ class SongCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      song.nameEllipsis,
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: Colors.deepPurple,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    Text(
-                      song.arNameEllipsis,
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: Colors.deepPurpleAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        song.name,
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: Colors.deepPurple,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        song.arName,
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: Colors.deepPurpleAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
                 const Icon(
                   Icons.play_circle,

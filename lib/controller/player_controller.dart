@@ -15,6 +15,7 @@ class PlayerController extends GetxController {
   var position = Duration.zero.obs;
   var duration = Duration.zero.obs;
   var playerState = PlayerState.stopped.obs;
+  bool get isPlaying => playerState.value == PlayerState.playing;
 
   final _playbackModes = [
     PlaybackMode.repeatAll,
@@ -22,29 +23,41 @@ class PlayerController extends GetxController {
     PlaybackMode.shuffle
   ];
   var playbackModeIndex = 0.obs;
-
-  final data = PlaybackData().obs;
-  final shuffleData = PlaybackData().obs;
-
-  List<SongVo> get songs => playbackMode == PlaybackMode.shuffle
-      ? shuffleData.value.songs
-      : data.value.songs;
-
-  SongVo get song => playbackMode == PlaybackMode.shuffle
-      ? shuffleData.value.song
-      : data.value.song;
-
-  int get curr => playbackMode == PlaybackMode.shuffle
-      ? shuffleData.value.curr
-      : data.value.curr;
-
   PlaybackMode get playbackMode => _playbackModes[playbackModeIndex.value];
 
-  bool get isPlaying => playerState.value == PlayerState.playing;
+  // 歌单原始顺序
+  final data = PlaybackData().obs;
+
+  // 随机顺序
+  final shuffleIndexes = <int>[].obs;
+
+  // 播放队列
+  List<SongVo> get songs {
+    if (playbackMode == PlaybackMode.shuffle) {
+      return shuffleIndexes.map((i) => data.value.songs[i]).toList();
+    }
+    return data.value.songs;
+  }
+
+  int get curr => data.value.curr;
+
+  SongVo get song {
+    if (songs.isEmpty || curr < 0) {
+      return SongVo();
+    }
+    if (playbackMode == PlaybackMode.shuffle) {
+      int j = _findIndex(shuffleIndexes, curr);
+      return songs[j];
+    }
+    return songs[curr];
+  }
+
+  SongVo get song2 => songs.isNotEmpty && curr >= 0 ? songs[curr] : SongVo();
 
   @override
   onInit() {
     super.onInit();
+
     _player.onPlayerStateChanged.listen((state) {
       playerState.value = state;
       if (state == PlayerState.completed) {
@@ -58,100 +71,98 @@ class PlayerController extends GetxController {
 
     _player.onPositionChanged.listen((position) {
       this.position.value = position;
-      vlog.d('onPositionChanged $position');
     });
   }
 
   void onCompleted() {
-    switch (playbackMode) {
-      case PlaybackMode.repeatAll:
-        skipNext();
-        break;
-      case PlaybackMode.repeatOne:
-        _play(song.id);
-        break;
-      case PlaybackMode.shuffle:
-        reshuffle(song.id);
+    if (playbackMode == PlaybackMode.repeatOne) {
+      _play(song.id);
+    } else {
+      skip2Next();
     }
   }
 
-  void startPlaying(List<SongVo> tracks, int index) {
+  void startPlaying(List<SongVo> tracks, int i) {
     if (tracks.isEmpty) {
-      vlog.e('empty tracks');
+      vlog.w('empty tracks');
       return;
     }
-    if (index < 0 || index >= tracks.length) {
-      vlog.e('index out of range: index:$index length:${tracks.length}');
+    if (i < 0 || i >= tracks.length) {
+      vlog.e('index out of range: index:$i length:${tracks.length}');
       return;
     }
 
-    //歌单原始顺序
+    // 重新加载
     data.value.reload(tracks);
-
-    int id = tracks[index].id;
-    if (!_playWrap(id)) {
-      return;
-    }
     if (playbackMode == PlaybackMode.shuffle) {
-      //随机播放
-      reshuffle(id);
-    } else {
-      //列表循环 单曲循环
-      data.value.findCurr(id);
-      vlog.i('message ${song.id}');
-    }
-  }
-
-  void reshuffle(int id) {
-    shuffleData.value.reload(List<SongVo>.from(data.value.songs)..shuffle());
-    shuffleData.value.findCurr(id);
-  }
-
-  void skipPrevious() {
-    if (songs.length <= 1) {
-      vlog.i('length:${songs.length}');
-      return;
+      reshuffle();
     }
 
-    if (playbackMode == PlaybackMode.shuffle) {
-      _play(songs[shuffleData.value.previous()].id);
-      vlog.i('previous shuffle ${shuffleData.value.curr}');
-    } else {
-      _play(songs[data.value.previous()].id);
-      vlog.i('previous repeat ${data.value.curr}');
-    }
-  }
-
-  void skipNext() {
-    if (songs.length <= 1) {
-      vlog.i('length:${songs.length}');
-      return;
-    }
-
-    if (playbackMode == PlaybackMode.shuffle) {
-      _play(songs[shuffleData.value.next()].id);
-      vlog.i('next shuffle ${shuffleData.value.curr}');
-    } else {
-      _play(songs[data.value.next()].id);
-      vlog.i('next repeat ${data.value.curr}');
-    }
-  }
-
-  bool _playWrap(int id) {
+    int id = tracks[i].id;
     if (song.id == id) {
-      vlog.i('The same song: $id ${playerState.value}');
-      return false;
+      vlog.d('The same song: $id ${playerState.value}');
+      return;
     }
+
+    data.value.setCurr(i);
     _play(id);
-    return true;
+  }
+
+  void playSelected(int id) {
+    for (var i = 0; i < data.value.songs.length; i++) {
+      if (data.value.songs[i].id == id) {
+        data.value.setCurr(i);
+        _play(id);
+      }
+    }
+  }
+
+  void skip2Previous() {
+    if (songs.length <= 1) {
+      return;
+    }
+
+    int prev = 0;
+    if (playbackMode == PlaybackMode.shuffle) {
+      int j = _findIndex(shuffleIndexes, curr);
+      if (j == -1) {
+        return;
+      }
+      prev = shuffleIndexes[_previous(j, shuffleIndexes.length)];
+    } else {
+      prev = _previous(curr, data.value.songs.length);
+    }
+
+    data.value.setCurr(prev);
+    _play(songs[prev].id);
+    vlog.i('skip to previous $prev');
+  }
+
+  void skip2Next() {
+    if (songs.length <= 1) {
+      return;
+    }
+
+    int next = 0;
+    if (playbackMode == PlaybackMode.shuffle) {
+      int j = _findIndex(shuffleIndexes, curr);
+      if (j == -1) {
+        return;
+      }
+      next = shuffleIndexes[_next(j, shuffleIndexes.length)];
+    } else {
+      next = _next(curr, data.value.songs.length);
+    }
+
+    data.value.setCurr(next);
+    _play(songs[next].id);
+    vlog.i('skip to next $next');
   }
 
   Future<void> _play(int id) async {
     final url = await MusicDao.songUrl(id);
-    var source = UrlSource(url);
-    // var source = AssetSource(url);
-    _player.play(source);
-    vlog.i('播放: $url');
+    _player.play(UrlSource(url));
+    vlog.d('播放: $url');
   }
 
   void pause() {
@@ -166,51 +177,55 @@ class PlayerController extends GetxController {
     _player.seek(position);
   }
 
-  void onQueue() {
-    vlog.d('onQueue');
-  }
-
   void favorite() {
     song.isFavorite = 1 - song.isFavorite;
   }
 
+  void reshuffle() {
+    shuffleIndexes.value =
+        List.generate(data.value.songs.length, (index) => index)..shuffle();
+  }
+
+  int _previous(int current, int length) {
+    return current - 1 < 0 ? length - 1 : current - 1;
+  }
+
+  int _next(int current, int length) {
+    return current + 1 > length - 1 ? 0 : current + 1;
+  }
+
+  int _findIndex(List<int> arr, int val) {
+    for (var i = 0; i < arr.length; i++) {
+      if (val == arr[i]) {
+        return i;
+      }
+    }
+    vlog.e('$val not found in $arr');
+    return -1;
+  }
+
   void onPlaybackModeChanged() {
     playbackModeIndex.value =
-        playbackModeIndex.value == _playbackModes.length - 1
-            ? 0
-            : playbackModeIndex.value + 1;
+        _next(playbackModeIndex.value, _playbackModes.length);
 
-    if (playbackMode == PlaybackMode.repeatAll) {
-      data.value.findCurr(shuffleData.value.song.id);
-      vlog.i('findCurr shuffle ${shuffleData.value.song.id}');
-    } else if (playbackMode == PlaybackMode.shuffle) {
-      reshuffle(data.value.song.id);
-      vlog.i('findCurr ${song.id}');
+    if (playbackMode == PlaybackMode.shuffle) {
+      reshuffle();
     }
-
-    Get.snackbar(
-      LocaleKeys.playbackMode_name.tr,
-      playbackModeText(),
-      margin: const EdgeInsets.all(20.0),
-      duration: const Duration(seconds: 2),
-    );
   }
 
   IconData playbackModeIcon() {
-    if (playbackMode == PlaybackMode.shuffle) {
-      return Icons.shuffle;
-    } else if (playbackMode == PlaybackMode.repeatOne) {
-      return Icons.repeat_one;
-    }
-    return Icons.repeat;
+    return playbackMode == PlaybackMode.shuffle
+        ? Icons.shuffle
+        : playbackMode == PlaybackMode.repeatOne
+            ? Icons.repeat_one
+            : Icons.repeat;
   }
 
   String playbackModeText() {
-    if (playbackMode == PlaybackMode.shuffle) {
-      return LocaleKeys.playbackMode_shuffle.tr;
-    } else if (playbackMode == PlaybackMode.repeatOne) {
-      return LocaleKeys.playbackMode_repeatOne.tr;
-    }
-    return LocaleKeys.playbackMode_repeatAll.tr;
+    return playbackMode == PlaybackMode.shuffle
+        ? LocaleKeys.playbackMode_shuffle.tr
+        : playbackMode == PlaybackMode.repeatOne
+            ? LocaleKeys.playbackMode_repeatOne.tr
+            : LocaleKeys.playbackMode_repeatAll.tr;
   }
 }

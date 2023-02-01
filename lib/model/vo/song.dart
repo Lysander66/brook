@@ -12,8 +12,6 @@ class SongVo {
   String name;
   String alPicUrl;
   String arName;
-  String nameEllipsis;
-  String arNameEllipsis;
   int isFavorite;
 
   SongVo({
@@ -21,9 +19,7 @@ class SongVo {
     this.name = '',
     this.alPicUrl = '',
     this.arName = '',
-    this.nameEllipsis = '',
-    this.arNameEllipsis = '',
-    this.isFavorite = 1,
+    this.isFavorite = 0,
   });
 
   factory SongVo.fromJson(Map<String, dynamic> json) => _$SongVoFromJson(json);
@@ -36,14 +32,8 @@ class SongVo {
       name: track.name,
       alPicUrl: track.al.picUrl,
       arName: track.artistName,
-      nameEllipsis: ellipsis(track.name),
-      arNameEllipsis: ellipsis(track.artistName),
     );
     return item;
-  }
-
-  static String ellipsis(String name) {
-    return name.length <= 9 ? name : '${name.substring(0, 9)}...';
   }
 
   @override

@@ -75,31 +75,31 @@ class _Header extends StatelessWidget {
           left: screen.calc(32),
           right: screen.calc(32),
           bottom: screen.calc(18)),
-      child: Obx(
-        () => Column(children: [
-          Padding(
-              padding: EdgeInsets.only(top: screen.calc(38)),
-              child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                Text.rich(
-                  TextSpan(children: [
-                    TextSpan(
-                        text: '当前播放',
-                        style: TextStyle(
-                            fontSize: screen.calc(36),
-                            fontWeight: FontWeight.w700)),
-                    TextSpan(
-                        text: ' (85)',
-                        style: TextStyle(
-                            fontSize: screen.calc(32),
-                            color: const Color(0xff999999))),
-                  ]),
-                )
-              ])),
-          Padding(
-              padding: EdgeInsets.only(top: screen.calc(26)),
-              child: Row(
-                children: [
-                  Row(
+      child: Column(children: [
+        Padding(
+            padding: EdgeInsets.only(top: screen.calc(38)),
+            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(
+                      text: '当前播放',
+                      style: TextStyle(
+                          fontSize: screen.calc(36),
+                          fontWeight: FontWeight.w700)),
+                  TextSpan(
+                      text: ' (${playerController.songs.length})',
+                      style: TextStyle(
+                          fontSize: screen.calc(32),
+                          color: const Color(0xff999999))),
+                ]),
+              )
+            ])),
+        Padding(
+            padding: EdgeInsets.only(top: screen.calc(26)),
+            child: Row(
+              children: [
+                GestureDetector(
+                  child: Row(
                     children: [
                       Icon(
                         playerController.playbackModeIcon(),
@@ -107,29 +107,127 @@ class _Header extends StatelessWidget {
                       Text(playerController.playbackModeText())
                     ],
                   ),
-                  const Spacer(),
-                  Padding(
-                      padding: EdgeInsets.only(right: screen.calc(32)),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.create_new_folder,
-                              color: Color(0xff999999)),
-                          Text('收藏全部')
-                        ],
-                      )),
-                  Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                          left: BorderSide(width: 1, color: Color(0xffe6e6e6))),
-                    ),
-                    padding: EdgeInsets.only(left: screen.calc(30)),
-                    child: const Icon(Icons.delete, color: Color(0xff999999)),
+                  onTap: () {
+                    playerController.onPlaybackModeChanged();
+                  },
+                ),
+                const Spacer(),
+                Padding(
+                    padding: EdgeInsets.only(right: screen.calc(32)),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.create_new_folder, color: Color(0xff999999)),
+                        Text('收藏全部')
+                      ],
+                    )),
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                        left: BorderSide(width: 1, color: Color(0xffe6e6e6))),
                   ),
-                ],
-              )),
-        ]),
+                  padding: EdgeInsets.only(left: screen.calc(30)),
+                  child: const Icon(Icons.delete, color: Color(0xff999999)),
+                ),
+              ],
+            )),
+      ]),
+    );
+  }
+}
+
+class _List extends StatelessWidget {
+  final PlayerController playerController = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    final screen = Screen(context);
+
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: screen.calc(32)),
+          child: Column(
+            children: playerController.songs
+                .map((item) => _ListItem(
+                      id: item.id,
+                      title: item.name,
+                      artist: item.arName,
+                      active: item.id == playerController.song.id,
+                      onTap: () {
+                        playerController.playSelected(item.id);
+                      },
+                    ))
+                .toList(),
+          ),
+        ),
       ),
     );
+  }
+}
+
+class _ListItem extends StatelessWidget {
+  final int id;
+  final String title;
+  final String artist;
+  final bool active;
+  final GestureTapCallback onTap;
+
+  const _ListItem({
+    Key? key,
+    required this.id,
+    required this.title,
+    required this.artist,
+    required this.active,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final screen = Screen(context);
+
+    return Container(
+        height: screen.calc(89),
+        decoration: const BoxDecoration(
+          border:
+              Border(bottom: BorderSide(width: 1, color: Color(0xffe6e6e6))),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: InkWell(
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                          text: title,
+                          style: TextStyle(
+                            color: active
+                                ? const Color(0xffeb534c)
+                                : const Color(0xff333333),
+                            fontSize: screen.calc(26),
+                            fontWeight: FontWeight.w700,
+                          )),
+                      TextSpan(
+                          text: ' - $artist',
+                          style: TextStyle(
+                            color: active
+                                ? const Color(0xffeb534c)
+                                : const Color(0xff666666),
+                            fontSize: screen.calc(22),
+                          )),
+                    ],
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                onTap: () {
+                  onTap();
+                },
+              ),
+            ),
+            const Spacer(),
+            const Icon(Icons.close, color: Color(0xff999999)),
+          ],
+        ));
   }
 }
 
@@ -150,87 +248,6 @@ class _Footer extends StatelessWidget {
           ),
           child: Center(
               child: Text('关闭', style: TextStyle(fontSize: screen.calc(32)))),
-        ));
-  }
-}
-
-class _List extends StatelessWidget {
-  final PlayerController playerController = Get.find();
-
-  @override
-  Widget build(BuildContext context) {
-    final screen = Screen(context);
-
-    return Obx(() => Expanded(
-          child: SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.only(
-                  left: screen.calc(32), right: screen.calc(32)),
-              child: Column(
-                children: playerController.songs
-                    .map((item) => _ListItem(
-                          title: item.name,
-                          artist: item.arName,
-                          active: item.id == playerController.song.id,
-                        ))
-                    .toList(),
-              ),
-            ),
-          ),
-        ));
-  }
-}
-
-class _ListItem extends StatelessWidget {
-  final String title;
-  final String artist;
-  final bool active;
-
-  const _ListItem(
-      {Key? key,
-      required this.title,
-      required this.artist,
-      this.active = false})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final screen = Screen(context);
-
-    return Container(
-        height: screen.calc(89),
-        decoration: const BoxDecoration(
-          border:
-              Border(bottom: BorderSide(width: 1, color: Color(0xffe6e6e6))),
-        ),
-        child: Row(
-          children: [
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                      text: title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: screen.calc(26),
-                        color: active
-                            ? const Color(0xffeb534c)
-                            : const Color(0xff333333),
-                      )),
-                  TextSpan(
-                      text: ' - $artist',
-                      style: TextStyle(
-                          color: active
-                              ? const Color(0xffeb534c)
-                              : const Color(0xff666666),
-                          fontSize: screen.calc(22))),
-                ],
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-            const Spacer(),
-            const Icon(Icons.close, color: Color(0xff999999)),
-          ],
         ));
   }
 }

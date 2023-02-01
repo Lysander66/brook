@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controller/player_controller.dart';
+import '../generated/locales.g.dart';
 import 'play_queue.dart';
 
 class SongScreen extends StatelessWidget {
@@ -156,6 +157,12 @@ class _Panel extends StatelessWidget {
             IconButton(
               onPressed: () {
                 playerController.onPlaybackModeChanged();
+                Get.snackbar(
+                  LocaleKeys.playbackMode_name.tr,
+                  playerController.playbackModeText(),
+                  margin: const EdgeInsets.all(20.0),
+                  duration: const Duration(seconds: 2),
+                );
               },
               iconSize: 30,
               icon: Icon(
@@ -165,7 +172,7 @@ class _Panel extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                playerController.skipPrevious();
+                playerController.skip2Previous();
               },
               iconSize: 45,
               icon: const Icon(Icons.skip_previous, color: Colors.white),
@@ -188,7 +195,7 @@ class _Panel extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                playerController.skipNext();
+                playerController.skip2Next();
               },
               iconSize: 45,
               icon: const Icon(Icons.skip_next, color: Colors.white),
@@ -196,7 +203,6 @@ class _Panel extends StatelessWidget {
             IconButton(
               onPressed: () {
                 showQueue(context);
-                playerController.onQueue();
               },
               iconSize: 30,
               icon: const Icon(Icons.queue_music, color: Colors.white),
