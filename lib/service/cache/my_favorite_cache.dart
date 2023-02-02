@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../../model/vo/song.dart';
 import 'config.dart';
 
@@ -7,11 +9,16 @@ class MyFavoriteCache {
   static const _myFavoriteKey = 'myFavorite';
 
   static List<SongVo> get() {
-    List<SongVo>? value = box.read<List<SongVo>>(_myFavoriteKey);
-    return value ?? [];
+    var result = box.read(_myFavoriteKey);
+    if (result == null) {
+      return [];
+    }
+    return (jsonDecode(result) as List<dynamic>)
+        .map((e) => SongVo.fromJson(e))
+        .toList();
   }
 
   static Future<void> set(List<SongVo> value) async {
-    await box.write(_myFavoriteKey, value);
+    await box.write(_myFavoriteKey, jsonEncode(value));
   }
 }

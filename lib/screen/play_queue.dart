@@ -70,68 +70,71 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final screen = Screen(context);
 
-    return Container(
-      padding: EdgeInsets.only(
-          left: screen.calc(32),
-          right: screen.calc(32),
-          bottom: screen.calc(18)),
-      child: Column(children: [
-        Padding(
-            padding: EdgeInsets.only(top: screen.calc(38)),
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Text.rich(
-                TextSpan(children: [
-                  TextSpan(
-                      text: '当前播放',
-                      style: TextStyle(
-                          fontSize: screen.calc(36),
-                          fontWeight: FontWeight.w700)),
-                  TextSpan(
-                      text: ' (${playerController.songs.length})',
-                      style: TextStyle(
-                          fontSize: screen.calc(32),
-                          color: const Color(0xff999999))),
-                ]),
-              )
-            ])),
-        Padding(
-            padding: EdgeInsets.only(top: screen.calc(26)),
-            child: Row(
-              children: [
-                GestureDetector(
-                  child: Row(
-                    children: [
-                      Icon(
-                        playerController.playbackModeIcon(),
+    return Obx(() => Container(
+          padding: EdgeInsets.only(
+              left: screen.calc(32),
+              right: screen.calc(32),
+              bottom: screen.calc(18)),
+          child: Column(children: [
+            Padding(
+                padding: EdgeInsets.only(top: screen.calc(38)),
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                  Text.rich(
+                    TextSpan(children: [
+                      TextSpan(
+                          text: '当前播放',
+                          style: TextStyle(
+                              fontSize: screen.calc(36),
+                              fontWeight: FontWeight.w700)),
+                      TextSpan(
+                          text: ' (${playerController.songs.length})',
+                          style: TextStyle(
+                              fontSize: screen.calc(32),
+                              color: const Color(0xff999999))),
+                    ]),
+                  )
+                ])),
+            Padding(
+                padding: EdgeInsets.only(top: screen.calc(26)),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      child: Row(
+                        children: [
+                          Icon(
+                            playerController.playbackModeIcon(),
+                          ),
+                          Text(playerController.playbackModeText())
+                        ],
                       ),
-                      Text(playerController.playbackModeText())
-                    ],
-                  ),
-                  onTap: () {
-                    playerController.onPlaybackModeChanged();
-                  },
-                ),
-                const Spacer(),
-                Padding(
-                    padding: EdgeInsets.only(right: screen.calc(32)),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.create_new_folder, color: Color(0xff999999)),
-                        Text('收藏全部')
-                      ],
-                    )),
-                Container(
-                  decoration: const BoxDecoration(
-                    border: Border(
-                        left: BorderSide(width: 1, color: Color(0xffe6e6e6))),
-                  ),
-                  padding: EdgeInsets.only(left: screen.calc(30)),
-                  child: const Icon(Icons.delete, color: Color(0xff999999)),
-                ),
-              ],
-            )),
-      ]),
-    );
+                      onTap: () {
+                        playerController.onPlaybackModeChanged();
+                      },
+                    ),
+                    const Spacer(),
+                    Padding(
+                        padding: EdgeInsets.only(right: screen.calc(32)),
+                        child: Row(
+                          children: const [
+                            Icon(Icons.create_new_folder,
+                                color: Color(0xff999999)),
+                            Text('收藏全部')
+                          ],
+                        )),
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                            left:
+                                BorderSide(width: 1, color: Color(0xffe6e6e6))),
+                      ),
+                      padding: EdgeInsets.only(left: screen.calc(30)),
+                      child: const Icon(Icons.delete, color: Color(0xff999999)),
+                    ),
+                  ],
+                )),
+          ]),
+        ));
   }
 }
 

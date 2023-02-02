@@ -2,6 +2,7 @@ import 'package:brook/widget/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controller/my_favorite_controller.dart';
 import '../controller/player_controller.dart';
 import '../generated/locales.g.dart';
 import 'play_queue.dart';
@@ -73,6 +74,7 @@ class _BackgroundFilter extends StatelessWidget {
 
 class _MusicPlayer extends StatelessWidget {
   final PlayerController playerController = Get.find();
+  final MyFavoriteController myFavoriteController = Get.find();
 
   _MusicPlayer({Key? key}) : super(key: key);
 
@@ -101,7 +103,9 @@ class _MusicPlayer extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      playerController.favorite();
+                      playerController.song.isFavorite =
+                          1 - playerController.song.isFavorite;
+                      myFavoriteController.favorite(playerController.song);
                     },
                     iconSize: 30,
                     icon: playerController.song.isFavorite == 1

@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import '../common/constant/player.dart';
 import '../generated/locales.g.dart';
 import '../model/vo/playback_data.dart';
-import '../service/cache/my_favorite_cache.dart';
 import '../service/dao/music_dao.dart';
 
 class PlayerController extends GetxController {
@@ -25,9 +24,6 @@ class PlayerController extends GetxController {
   ];
   var playbackModeIndex = 0.obs;
   PlaybackMode get playbackMode => _playbackModes[playbackModeIndex.value];
-
-  // 我的收藏
-  final myFavorites = <SongVo>[].obs;
 
   // 歌单原始顺序
   final data = PlaybackData().obs;
@@ -56,13 +52,9 @@ class PlayerController extends GetxController {
     return songs[curr];
   }
 
-  SongVo get song2 => songs.isNotEmpty && curr >= 0 ? songs[curr] : SongVo();
-
   @override
   onInit() {
     super.onInit();
-
-    myFavorites.value = MyFavoriteCache.get();
 
     _player.onPlayerStateChanged.listen((state) {
       playerState.value = state;
@@ -78,18 +70,6 @@ class PlayerController extends GetxController {
     _player.onPositionChanged.listen((position) {
       this.position.value = position;
     });
-  }
-
-  void favorite() {
-    song.isFavorite = 1 - song.isFavorite;
-    for (var v in myFavorites) {
-      vlog.i(v);
-    }
-    if (song.isFavorite == 1) {
-      myFavorites.add(song);
-      vlog.i('add');
-      MyFavoriteCache.set(myFavorites);
-    }
   }
 
   void onCompleted() {
@@ -115,15 +95,17 @@ class PlayerController extends GetxController {
       return;
     }
 
+    final id = tracks[i].id;
+    final currentId = song.id;
+
     // 重新加载
     data.value.reload(tracks);
     if (playbackMode == PlaybackMode.shuffle) {
       reshuffle();
     }
 
-    int id = tracks[i].id;
-    if (song.id == id) {
-      vlog.d('The same song: $id ${playerState.value}');
+    if (currentId == id) {
+      vlog.d('The same song: $id $playerState');
       return;
     }
 
@@ -158,7 +140,7 @@ class PlayerController extends GetxController {
 
     data.value.setCurr(prev);
     _play(songs[prev].id);
-    vlog.i('skip to previous $prev');
+    vlog.d('skip to previous $prev');
   }
 
   void skip2Next() {
@@ -179,7 +161,7 @@ class PlayerController extends GetxController {
 
     data.value.setCurr(next);
     _play(songs[next].id);
-    vlog.i('skip to next $next');
+    vlog.d('skip to next $next');
   }
 
   Future<void> _play(int id) async {

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controller/my_favorite_controller.dart';
 import '../controller/player_controller.dart';
+import '../generated/locales.g.dart';
 import '../model/vo/song.dart';
 import 'song_screen.dart';
 
 class MyFavoriteScreen extends StatelessWidget {
   final PlayerController playerController = Get.find();
+  final MyFavoriteController myFavoriteController = Get.find();
 
   MyFavoriteScreen({Key? key}) : super(key: key);
 
@@ -29,18 +32,17 @@ class MyFavoriteScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Text('我的收藏'),
+          title: Text(LocaleKeys.home_myFavorite.tr),
         ),
         body: SingleChildScrollView(
-          child: Obx(() => Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    _PlaylistSongs(
-                        playlist: playerController.myFavorites.value),
-                  ],
-                ),
-              )),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                _PlaylistSongs(playlist: myFavoriteController.myFavorites),
+              ],
+            ),
+          ),
         ),
       ),
     );

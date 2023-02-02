@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../common/res/r.dart';
 import '../controller/home_controller.dart';
+import '../controller/my_favorite_controller.dart';
 import '../controller/player_controller.dart';
 import '../generated/locales.g.dart';
 import '../model/dto/playlist.dart';
@@ -12,6 +13,7 @@ import 'screens.dart';
 class HomeScreen extends StatelessWidget {
   final homeController = Get.put(HomeController());
   final playerController = Get.put(PlayerController());
+  final myFavoriteController = Get.put(MyFavoriteController());
 
   HomeScreen({Key? key}) : super(key: key);
 
