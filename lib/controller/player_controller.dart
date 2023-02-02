@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import '../common/constant/player.dart';
 import '../generated/locales.g.dart';
 import '../model/vo/playback_data.dart';
+import '../service/cache/my_favorite_cache.dart';
 import '../service/dao/music_dao.dart';
 
 class PlayerController extends GetxController {
@@ -24,6 +25,9 @@ class PlayerController extends GetxController {
   ];
   var playbackModeIndex = 0.obs;
   PlaybackMode get playbackMode => _playbackModes[playbackModeIndex.value];
+
+  // 我的收藏
+  final myFavorites = <SongVo>[].obs;
 
   // 歌单原始顺序
   final data = PlaybackData().obs;
@@ -58,6 +62,8 @@ class PlayerController extends GetxController {
   onInit() {
     super.onInit();
 
+    myFavorites.value = MyFavoriteCache.get();
+
     _player.onPlayerStateChanged.listen((state) {
       playerState.value = state;
       if (state == PlayerState.completed) {
@@ -74,12 +80,29 @@ class PlayerController extends GetxController {
     });
   }
 
+  void favorite() {
+    song.isFavorite = 1 - song.isFavorite;
+    for (var v in myFavorites) {
+      vlog.i(v);
+    }
+    if (song.isFavorite == 1) {
+      myFavorites.add(song);
+      vlog.i('add');
+      MyFavoriteCache.set(myFavorites);
+    }
+  }
+
   void onCompleted() {
     if (playbackMode == PlaybackMode.repeatOne) {
       _play(song.id);
     } else {
       skip2Next();
     }
+  }
+
+  void reshuffle() {
+    shuffleIndexes.value =
+        List.generate(data.value.songs.length, (index) => index)..shuffle();
   }
 
   void startPlaying(List<SongVo> tracks, int i) {
@@ -177,13 +200,13 @@ class PlayerController extends GetxController {
     _player.seek(position);
   }
 
-  void favorite() {
-    song.isFavorite = 1 - song.isFavorite;
-  }
+  void onPlaybackModeChanged() {
+    playbackModeIndex.value =
+        _next(playbackModeIndex.value, _playbackModes.length);
 
-  void reshuffle() {
-    shuffleIndexes.value =
-        List.generate(data.value.songs.length, (index) => index)..shuffle();
+    if (playbackMode == PlaybackMode.shuffle) {
+      reshuffle();
+    }
   }
 
   int _previous(int current, int length) {
@@ -202,15 +225,6 @@ class PlayerController extends GetxController {
     }
     vlog.e('$val not found in $arr');
     return -1;
-  }
-
-  void onPlaybackModeChanged() {
-    playbackModeIndex.value =
-        _next(playbackModeIndex.value, _playbackModes.length);
-
-    if (playbackMode == PlaybackMode.shuffle) {
-      reshuffle();
-    }
   }
 
   IconData playbackModeIcon() {

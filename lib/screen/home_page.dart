@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> {
           index: _selectedIndex,
           children: [
             HomeScreen(),
+            MyFavoriteScreen(),
             ProfileScreen(),
           ],
         ),
@@ -53,6 +54,8 @@ class _HomePageState extends State<HomePage> {
           showUnselectedLabels: false,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.favorite), label: 'MyFavorite'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
           onTap: _onItemTapped,

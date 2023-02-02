@@ -6,6 +6,7 @@ import '../common/res/r.dart';
 import '../controller/home_controller.dart';
 import '../controller/player_controller.dart';
 import '../generated/locales.g.dart';
+import '../model/dto/playlist.dart';
 import 'screens.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -34,7 +35,7 @@ class HomeScreen extends StatelessWidget {
             body: SingleChildScrollView(
               child: Column(
                 children: [
-                  const _DiscoverMusic(),
+                  _DiscoverMusic(),
                   _TrendingMusic(),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -100,9 +101,9 @@ class _CustomAppBar extends StatelessWidget with PreferredSizeWidget {
 }
 
 class _DiscoverMusic extends StatelessWidget {
-  const _DiscoverMusic({
-    Key? key,
-  }) : super(key: key);
+  final HomeController homeController = Get.find();
+
+  _DiscoverMusic({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +141,19 @@ class _DiscoverMusic extends StatelessWidget {
                 borderSide: BorderSide.none,
               ),
             ),
+            style: const TextStyle(color: Colors.black),
+            onFieldSubmitted: (String keyword) async {
+              if (keyword.isNotEmpty) {
+                var resp = await homeController.search(keyword);
+                var playlist = Playlist(
+                  name: '搜索结果',
+                  coverImgUrl:
+                      'http://p2.music.126.net/ss5Rm0q7UIV1cMvUid-tbw==/5727356069142637.jpg?param=177y177',
+                  tracks: resp.result.songs,
+                );
+                Get.to(() => PlaylistScreen(playlist: playlist));
+              }
+            },
           )
         ],
       ),

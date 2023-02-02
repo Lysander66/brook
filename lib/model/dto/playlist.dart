@@ -57,7 +57,7 @@ class Playlist {
   late int commentCount;
   late String gradeStatus;
 
-  Playlist();
+  Playlist({this.name = '', this.coverImgUrl = '', required this.tracks});
 
   factory Playlist.fromJson(Map<String, dynamic> json) =>
       _$PlaylistFromJson(json);
