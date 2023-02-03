@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../service/android_back_desktop.dart';
 import 'screens.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,14 +25,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (DateTime.now().difference(_lastExitTime) >=
-            const Duration(seconds: 1)) {
-          const snack = SnackBar(
-            content: Text('Press the back button again to exit the app'),
-            duration: Duration(seconds: 2),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snack);
+        if (DateTime.now().difference(_lastExitTime) >= const Duration(seconds: 1)) {
+          // const snack = SnackBar(
+          //   content: Text('Press the back button again to exit the app'),
+          //   duration: Duration(seconds: 2),
+          // );
+          // ScaffoldMessenger.of(context).showSnackBar(snack);
           _lastExitTime = DateTime.now();
+          // 返回桌面 不退出
+          AndroidBackDesktop.backToDesktop();
           return false;
         }
         return true;
