@@ -39,6 +39,7 @@ dependencies:
   flutter_dotenv: ^5.0.2
   audioplayers: ^3.0.0
   cached_network_image: ^3.2.3
+  flutter_background: ^1.2.0
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,7 @@ import 'dart:io' show Platform, exit;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:get/get.dart';
 
 import 'generated/locales.g.dart';
@@ -12,6 +13,18 @@ import 'util/utils.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ConfigService.init();
+
+  const androidConfig = FlutterBackgroundAndroidConfig(
+    notificationTitle: 'brook',
+    notificationText:
+        'Background notification for keeping the example app running in the background',
+    notificationImportance: AndroidNotificationImportance.Default,
+    notificationIcon: AndroidResource(
+      name: 'background_icon',
+      defType: 'drawable',
+    ), // Default is ic_launcher from folder mipmap
+  );
+  await FlutterBackground.initialize(androidConfig: androidConfig);
 
   // 定时关闭
   Future.delayed(const Duration(minutes: 60), () {
