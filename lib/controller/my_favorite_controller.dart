@@ -32,16 +32,15 @@ class MyFavoriteController extends GetxController {
         myFavorites.insert(0, song);
         vlog.d('add ${song.id}');
       }
-      return;
-    }
-
-    for (var v in myFavorites) {
-      if (v.id == song.id) {
-        v.isFavorite = 0;
+    } else {
+      for (var v in myFavorites) {
+        if (v.id == song.id) {
+          v.isFavorite = 0;
+        }
       }
+      // myFavorites.remove(song);
+      vlog.d('remove ${song.id}');
     }
-    // myFavorites.remove(song);
-    vlog.d('remove ${song.id}');
 
     MyFavoriteCache.set(myFavorites);
   }
