@@ -17,3 +17,14 @@ flutter run --release
 ```sh
 get generate locales assets/locales
 ```
+
+## thanks
+
+- [Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
+- [dart-lang/http](https://pub.dev/packages/http)
+- [bluefireteam/audioplayers](https://pub.dev/packages/audioplayers)
+- [jonataslaw/getx](https://pub.dev/packages/get)
+- [jonataslaw/get_cli](https://pub.dev/packages/get_cli)
+- [jonataslaw/get_storage](https://pub.dev/packages/get_storage)
+- [JulianAssmann/flutter_background](https://pub.dev/packages/flutter_background)
+- ...
