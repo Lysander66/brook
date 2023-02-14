@@ -2,7 +2,7 @@
 
 Music app
 
-[B 站](https://www.bilibili.com/video/BV1P841137UT/)
+[B站视频](https://www.bilibili.com/video/BV1P841137UT/)
 
 ## Run
 
@@ -28,7 +28,7 @@ static Future<void> init() async {
 }
 ```
 
-配置不同环境的域名 `_hostDev` `_hostDev`
+配置不同环境的域名 `_hostProd` `_hostDev`
 
 music_dao.dart:27
 
