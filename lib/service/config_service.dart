@@ -11,7 +11,7 @@ import 'dao/define.dart';
 
 class ConfigService {
   static Future<void> init() async {
-    const env = String.fromEnvironment('AppEnvironment');
+    const env = String.fromEnvironment('APP_ENV');
 
     await GetStorage.init();
     await ConfigCache.setEnvironment(env.isNotEmpty ? env : Environment.dev);
